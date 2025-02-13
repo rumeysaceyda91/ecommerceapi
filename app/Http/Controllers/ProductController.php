@@ -4,20 +4,48 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Helper\fileUpload;
+use Illuminate\Support\Facades\Log;
+use DateTime;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::get();
+        $pageNumber = $request->pageNumber;
+        $pageSize = $request->pageSize;
+        $search = $request->search;
+        if(!isset($search))
+        {
+            $productCount = Product::get()->count();
+            $products = Product::get();
+        }else{
+            $productCount = Product::where('name', $search)->get()->count();
+            $products = Product::where('name', $search)->get();
+        }
+        $totalPageCount = ceil($productCount / $pageSize);
+
+        $model = [
+            "search" => $search,
+            "datas" => $products,
+            "pageNumber" => $pageNumber,
+            "pageSize" => $pageSize,
+            "totalPageCount" => $totalPageCount,
+            "isFirstPage" => $pageNumber == 1 ? true : false,
+            "isLastPage" => $totalPageCount == $pageNumber ? true : false
+        ];
 
         return response()->json(
-            $products
+            $model
         );
     }
 
     public function add(Request $request)
     {
+        $all = $request->all();
+        $file = $request->images;
+        $dt = new DateTime();
         $product = new Product([
             'name' => $request->name,
             'stock' => $request->stock,
@@ -25,12 +53,21 @@ class ProductController extends Controller
             'categories' => $request->categories,
             'isActive' => true,
             'imageUrls' => '',
-            'createdDate' => Date()
+            'createdDate' => $dt->format('Y-m-d H:i:s')
         ]);
-            
+
+        //unset($all['file']);unset($request->file('images'));
         $product->save();
+
+        //$image_path = $request->file('images')->store('files', 'public');
+        $image_path = $request->file('images')->store('files',['disk' => 'public_uploads']);
+        $data = Product::where('id', $product->id)->update([
+            'imageUrls' => $image_path
+        ]);
+        Log::info(json_encode($product->id));
+             
             
-        return response()->json(compact('product'), 201);
+        return response()->json($request, 201);
     }
 
     public function update(Request $request, $id)
@@ -51,7 +88,7 @@ class ProductController extends Controller
     {
         Product::where('id',$id)->delete();
             
-        return response()->json(['success'=>true, 'message'=>'Kategori Silindi']);
+        return response()->json(['success'=>true, 'message'=>'Ürün Silindi']);
     }
 
     public function changeActiveStatus(Request $request)
@@ -90,6 +127,15 @@ class ProductController extends Controller
 
         return response()->json(
             $products
+        );
+    }
+
+    public function getProductImages()
+    {
+        $product_images = ProductImage::get();
+
+        return response()->json(
+            $product_images
         );
     }
 }

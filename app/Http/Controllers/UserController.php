@@ -44,7 +44,7 @@ class UserController extends Controller
             // (optional) Attach the role to the token.
             $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
 
-            return response()->json(compact('token'));
+            return response()->json(compact('user','token'), 201);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
@@ -70,5 +70,11 @@ class UserController extends Controller
         JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function Users()
+    {
+        $users = User::get();
+        return response()->json(['users' => $users]);
     }
 }

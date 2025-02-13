@@ -44,10 +44,9 @@ class BasketController extends Controller
         return response()->json(['success'=>true,'message'=>'Sepet Silindi']);
     }
 
-    public function getCount()
+    public function getCount(Request $request)
     {
-        $user = Auth::user();
-        $count = Basket::where('userId', $user->id)->count();
+        $count = Basket::where('userId', $request->userId)->count();
 
         return response()->json(
             ["count" => $count]

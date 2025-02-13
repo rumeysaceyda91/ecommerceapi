@@ -14,6 +14,7 @@ Route::group([
     
     Route::post('register', [App\Http\Controllers\UserController::class, 'register']);
     Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
+    Route::get('Users', [App\Http\Controllers\UserController::class, 'Users']);
 
     Route::get('baskets', [App\Http\Controllers\BasketController::class, 'index']);
     Route::post('baskets/add', [App\Http\Controllers\BasketController::class, 'add']);
@@ -25,10 +26,11 @@ Route::group([
     Route::post('categories/update', [App\Http\Controllers\CategoryController::class, 'update']);
     Route::post('categories/removeById', [App\Http\Controllers\CategoryController::class, 'removeById']);
 
-    Route::get('orders', [App\Http\Controllers\OrderController::class, 'index']);
+    Route::post('orders', [App\Http\Controllers\OrderController::class, 'index']);
     Route::post('orders/create', [App\Http\Controllers\OrderController::class, 'add']);
 
     Route::post('products', [App\Http\Controllers\ProductController::class, 'index']);
+    Route::get('productimages', [App\Http\Controllers\ProductController::class, 'getProductImages']);
     Route::post('products/add', [App\Http\Controllers\ProductController::class, 'add']);
     Route::post('products/update', [App\Http\Controllers\ProductController::class, 'update']);
     Route::post('products/removeById', [App\Http\Controllers\ProductController::class, 'removeById']);

@@ -21,20 +21,24 @@ class BasketController extends Controller
 
     public function add(Request $request)
     {
-        $basket = new Basket([
-            'userId' => $request->userId,
-            'productId' => $request->productId,
-            'price' => $request->price,
-            'quantity' => $request->quantity
-        ]);
-            
-        $basket->save();
+        if(!empty($request->userId)){
+            $basket = new Basket([
+                'userId' => $request->userId,
+                'productId' => $request->productId,
+                'price' => $request->price,
+                'quantity' => $request->quantity
+            ]);
+                
+            $basket->save();
 
-        $product = Product::where('id', $request->productId)->get();
-        $product->stock -= $request->quantity;
-        Product::update($product)->where('id', $request->productId);
-            
-        return response()->json(["message" => "Ürün Eklendi"], 201);
+            $product = Product::where('id', $request->productId)->first();
+    
+            Product::where('id', $request->productId)->update(['stock' => intval($product->stock) - $request->quantity]);
+                
+            return response()->json(["message" => "Ürün sepete eklenmiştir"], 201);
+        }else{
+            return response()->json(["message" => "Lütfen login olunuz!!"], 401);
+        }
     }
 
     public function removeById($id)

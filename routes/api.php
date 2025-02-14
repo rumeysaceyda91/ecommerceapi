@@ -18,13 +18,13 @@ Route::group([
 
     Route::get('baskets', [App\Http\Controllers\BasketController::class, 'index']);
     Route::post('baskets/add', [App\Http\Controllers\BasketController::class, 'add']);
-    Route::post('baskets/removeById', [App\Http\Controllers\BasketController::class, 'removeById']);
+    Route::post('baskets/removeById/{id}', [App\Http\Controllers\BasketController::class, 'removeById']);
     Route::post('baskets/getCount', [App\Http\Controllers\BasketController::class, 'getCount']);
 
     Route::get('categories', [App\Http\Controllers\CategoryController::class, 'index']);
     Route::post('categories/add', [App\Http\Controllers\CategoryController::class, 'add']);
     Route::post('categories/update', [App\Http\Controllers\CategoryController::class, 'update']);
-    Route::post('categories/removeById', [App\Http\Controllers\CategoryController::class, 'removeById']);
+    Route::post('categories/removeById/{id}', [App\Http\Controllers\CategoryController::class, 'removeById']);
 
     Route::post('orders', [App\Http\Controllers\OrderController::class, 'index']);
     Route::post('orders/create', [App\Http\Controllers\OrderController::class, 'add']);
@@ -33,7 +33,7 @@ Route::group([
     Route::get('productimages', [App\Http\Controllers\ProductController::class, 'getProductImages']);
     Route::post('products/add', [App\Http\Controllers\ProductController::class, 'add']);
     Route::post('products/update', [App\Http\Controllers\ProductController::class, 'update']);
-    Route::post('products/removeById', [App\Http\Controllers\ProductController::class, 'removeById']);
+    Route::post('products/removeById/{id}', [App\Http\Controllers\ProductController::class, 'removeById']);
     Route::post('products/changeActiveStatus', [App\Http\Controllers\ProductController::class, 'changeActiveStatus']);
     Route::post('products/getById', [App\Http\Controllers\ProductController::class, 'getById']);
     Route::post('products/removeImageByProductIdAndIndex', [App\Http\Controllers\ProductController::class, 'removeImageByProductIdAndIndex']);

@@ -9,14 +9,20 @@ use Illuminate\Support\Facades\Auth;
 
 class BasketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $baskets = Basket::where('userId', $user->id)->get();
+        $user_id = $request->userId;
+        
+        if(!empty($user_id)){
+            $baskets = Basket::where('userId', $user_id)->get();
 
-        return response()->json(
-            $baskets
-        );
+            return response()->json(
+                $baskets
+            );
+        }
+        else{
+            return response()->json(['message'=>'Lütfen login olunuz'], 401);
+        }
     }
 
     public function add(Request $request)
@@ -35,7 +41,7 @@ class BasketController extends Controller
     
             Product::where('id', $request->productId)->update(['stock' => intval($product->stock) - $request->quantity]);
                 
-            return response()->json(["message" => "Ürün sepete eklenmiştir"], 201);
+            return response()->json(["message" => $request->userId], 201);
         }else{
             return response()->json(["message" => "Lütfen login olunuz!!"], 401);
         }

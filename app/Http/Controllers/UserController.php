@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -31,23 +33,28 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $data = $request->validate([
+            'email' => 'email|required',
+            'password' => 'required'
+        ]);
 
-        try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
-            }
-
-            // Get the authenticated user.
-            $user = auth()->user();
-
-            // (optional) Attach the role to the token.
-            $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
-
-            return response()->json(compact('user','token'), 201);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+        if (!auth()->attempt($data)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to authenticate.',
+            ], 401);
         }
+
+        $user = Auth::user();
+        $token = $user->createToken('appToken')->accessToken;
+        //$tokenResult = $user->createToken('Personal Access Token');
+        //$token = $tokenResult->token;
+        if($request->remember_me){
+            $token->expires_at = Carbon::now()->addWeeks(1);
+        }
+        //$token->save();
+
+        return response()->json(compact('user','token'), 201);
     }
 
     // Get authenticated user
@@ -65,11 +72,14 @@ class UserController extends Controller
     }
 
     // User logout
-    public function logout()
+    public function logout(Request $request)
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        //$request->token->revoke();
+        //$user = Auth::user()->token();
+       // $user->revoke();
+       Auth::logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => Auth::user()]);
     }
 
     public function Users()

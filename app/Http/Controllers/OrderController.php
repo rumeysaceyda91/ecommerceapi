@@ -10,31 +10,39 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $orders = Order::where('userId', $user->id)->get();
-
-        return response()->json(
-            $orders
-        );
+        $user_id = $request->userId;
+        
+        if(!empty($user_id)){
+            $orders = Order::where('userId', $user_id)->get();
+            return response()->json(
+                $orders
+            );
+        }
+        else{
+            return response()->json(['message'=>$user], 401);
+        }
     }
 
     public function add(Request $request)
     {
-        $user = Auth::user();
-        $basket = Basket::where('userId', $user->id)->get();
+        $user_id = $request->userId;
         $dt = new DateTime();
-
-        $orders = new Order([
-            'userId' => $user->id,
-            'productId' => $basket->productId,
-            'price' => $basket->price,
-            'quantity' => $basket->quantity,
-            'createdDate' => $dt->format('Y-m-d H:i:s')
-        ]);
-            
-        $orders->save();
+        $baskets = $request->baskets;
+        
+        foreach($baskets as $basket)
+        {
+            $orders = new Order([
+                'userId' => $user_id,
+                'productId' => $basket['productId'],
+                'price' => $basket['price'],
+                'quantity' => $basket['quantity'],
+                'createdDate' => $dt->format('Y-m-d H:i:s')
+            ]);
+                
+            $orders->save();
+        }
             
         return response()->json(["message" => "Sipariş Eklendi"], 201);
     }

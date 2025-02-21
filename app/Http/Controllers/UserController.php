@@ -11,12 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /*public function login(Request $request)
-    {
-        $user = User::where('email', $request->email)->get();
-        return response()->json(['name' => $user]);
-    }*/
-
     public function register(Request $request)
     {
         $user = new User([

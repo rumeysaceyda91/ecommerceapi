@@ -16,9 +16,16 @@ class BasketController extends Controller
         if(!empty($user_id)){
             $baskets = Basket::where('userId', $user_id)->get();
 
-            return response()->json(
-                $baskets
-            );
+            foreach($baskets as $basket){
+                $products = Product::where('id', $basket->productId)->get();
+            }
+
+            $model = [
+                "baskets" => $baskets,
+                "products" => $products
+            ];
+            
+            return response()->json($model);
         }
         else{
             return response()->json(['message'=>'Lütfen login olunuz'], 401);
